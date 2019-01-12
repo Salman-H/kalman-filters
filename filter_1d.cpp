@@ -4,19 +4,26 @@
 
 using namespace std;
 
-
-tuple<double, double> measurement_update(double mean1, double var1,
-                                         double mean2, double var2)
+struct Gaussian
 {
-    new_mean = ((mean2 * var1) + (mean1 * var2)) / (var1 + var2);
-    new_var = 1 / (1 / var1 + 1 / var2);
-    return make_tuple(new_mean, new_var);
-}
+	double mean;
+	double var;
+};
 
-tuple<double, double> state_prediction(double mean1, double var1,
-                                       double mean2, double var2)
+void filter(Gaussian* prior, Gaussian* measurement, Gaussian* motion)
 {
-	new_mean = mean1 + mean2;
-	new_var = var1 + var2;
-	return make_tuple(new_mean, new_var);
+	// update this state by taking into account measurement information
+	prior->mean = ((measurement->mean * prior->var)
+		              + (prior->mean * measurement->var))
+	                / (prior->var + measurement->var);
+	prior->var = 1 / (1 / prior->var + 1 / measurement->var);
+	printf("Update in position from measurement info ");
+	printf("(measurement update): %.2f, %.2f\n", prior->mean, prior->var);
+
+	// predict new state from prior and motion
+	prior->mean = prior->mean + motion->mean;
+	prior->var = prior->var + motion->var;
+	printf("Update in position from executed motion ");
+	printf("(state prediction): %.2f, %.2f\n", prior->mean, prior->var);
+
 }
