@@ -10,9 +10,23 @@ struct Gaussian
 	double var;
 };
 
+/**
+   Applies a 1D Kalman Filter.
+
+   Filtering consists of successively applying these two steps to estimate
+   state with increasing accuracy:
+   (1) Updating prior belief's mean and variance using measurement's mean
+       and variance (measurement update);
+   (2) Updating (1) with the motion's mean and variance (state prediction)
+
+   @param prior       the gaussian distribution of the prior belief of the state
+   @param measurement the gaussian distribution of the measurement of the state
+   @param motion      the guassian distribution of the motion that changes state
+*/
 void filter(Gaussian* prior, Gaussian* measurement, Gaussian* motion)
 {
-	// update this state by taking into account measurement information
+    // Before moving:
+    // Update prior state by taking into account measurement from sensors
 	prior->mean = ((measurement->mean * prior->var)
 		              + (prior->mean * measurement->var))
 	                / (prior->var + measurement->var);
@@ -20,7 +34,8 @@ void filter(Gaussian* prior, Gaussian* measurement, Gaussian* motion)
 	printf("Update in position from measurement info ");
 	printf("(measurement update): %.2f, %.2f\n", prior->mean, prior->var);
 
-	// predict new state from prior and motion
+    // After moving:
+    // update prior state with motion to predict new state
 	prior->mean = prior->mean + motion->mean;
 	prior->var = prior->var + motion->var;
 	printf("Update in position from executed motion ");
